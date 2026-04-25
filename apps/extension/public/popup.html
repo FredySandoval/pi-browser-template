@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      box-sizing: border-box;
+      min-width: 420px;
+      padding: 12px;
+    }
+
+    textarea {
+      box-sizing: border-box;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="extension-name"></h1>
+
+  <p><span id="status-dot" style="color: gray;">●</span> <span id="status-text">Checking...</span></p>
+
+  <section id="ready-section" hidden>
+    <button id="start-btn">Open Canvas</button>
+  </section>
+
+  <section id="setup-section">
+    <p>Install Command</p>
+    <textarea id="install-cmd" readonly rows="2" style="width: 100%;"></textarea>
+    <button id="copy-cmd">Copy</button>
+  </section>
+
+  <section id="trouble-section" hidden>
+    <p>Connection issue:</p>
+    <pre id="trouble-detail"></pre>
+    <ul>
+      <li>Re-run install command with correct ID</li>
+      <li id="quit-tip">Fully quit Chrome and reopen</li>
+      <li>Check that paths exist in install output</li>
+    </ul>
+    <button id="retry-btn">Retry Connection</button>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

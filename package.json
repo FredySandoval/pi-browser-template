@@ -1,0 +1,61 @@
+{
+  "name": "pi-browser-template",
+  "version": "0.1.0",
+  "description": "Blank Pi to Chrome extension wiring template with native messaging status popup",
+  "type": "module",
+  "author": "Fredy Sandoval <me@fredy.dev>",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "pnpm clean && pnpm build:extension && pnpm build:native && node scripts/copy-extension-assets.cjs",
+    "build:extension": "tsgo -p apps/extension/tsconfig.json",
+    "build:native": "tsgo -p apps/native-host/tsconfig.json",
+    "test": "bun test tests/pi.test.ts tests/native-host.test.ts tests/extension.test.ts tests/protocol.test.ts && pnpm typecheck",
+    "test:build": "pnpm build && bun test tests/build-output.test.ts",
+    "diagnose:native": "bash apps/native-host/install/diagnose.sh",
+    "typecheck": "pnpm typecheck:pi && pnpm typecheck:extension && pnpm typecheck:native && pnpm typecheck:shared && pnpm typecheck:tests",
+    "typecheck:tests": "tsgo -p tests/tsconfig.json --noEmit",
+    "typecheck:pi": "tsgo -p apps/pi/tsconfig.json --noEmit",
+    "typecheck:extension": "tsgo -p apps/extension/tsconfig.json --noEmit",
+    "typecheck:native": "tsgo -p apps/native-host/tsconfig.json --noEmit",
+    "typecheck:shared": "tsgo -p packages/shared/tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "typebox": "^1.1.24"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.326",
+    "@types/node": "^22.15.3",
+    "bun-types": "^1.3.1",
+    "@typescript/native-preview": "7.0.0-dev.20260424.1",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "chrome-extension",
+    "native-messaging",
+    "template",
+    "extension"
+  ],
+  "files": [
+    "apps/",
+    "packages/",
+    "types.d.ts",
+    "tsconfig.json",
+    "tsconfig.base.json",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "packageManager": "pnpm@10.31.0",
+  "engines": {
+    "pnpm": ">=10.31.0"
+  },
+  "pi": {
+    "extensions": [
+      "./apps/pi/src/index.ts"
+    ]
+  }
+}
