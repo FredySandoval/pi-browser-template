@@ -75,6 +75,10 @@ dist/chrome-extension
 
 ## Install the native host
 
+Copy the command from the extension
+
+<img width="619" height="216" alt="image" src="https://github.com/user-attachments/assets/591efeed-4390-4d3d-a607-10ea91872e69" />
+
 Pass the Chrome extension ID to the installer:
 
 ```bash
