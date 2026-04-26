@@ -95,6 +95,22 @@ You can also run:
 pnpm diagnose:native
 ```
 
+## Install in Pi for local development
+
+From the parent folder of this repository, install the package into Pi with a local path:
+
+```bash
+pi install ./pi-browser-template
+```
+
+If you are already inside this repository, use:
+
+```bash
+pi install .
+```
+
+After changing the Pi extension code, restart or reload Pi so it picks up the local package changes.
+
 ## Use from Pi
 
 This package registers:
@@ -171,6 +187,7 @@ pnpm test              # run tests and type checks
 pnpm test:build        # build, then test the output
 pnpm typecheck         # typecheck every workspace part
 pnpm diagnose:native   # inspect native host installation
+pnpm uninstall:native  # remove native host manifests, installed files, and temp files
 pnpm clean             # remove dist/
 ```
 
@@ -193,6 +210,22 @@ scripts/              Build helper scripts
 4. Run `pnpm build`.
 5. Reload the unpacked extension in Chrome.
 6. Try the popup or Pi tool again.
+
+## Cleanup
+
+To uninstall the native messaging host files created by `install.sh`, run:
+
+```bash
+pnpm uninstall:native
+```
+
+This removes the Chrome/Chromium native messaging manifests, the installed native host directory, and this project's temporary socket/token/log files.
+
+You can also remove the unpacked extension from:
+
+```text
+chrome://extensions
+```
 
 ## Notes
 

@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
   - popup connection status UI
   - extension icons and static assets
 - Native messaging host that bridges Chrome native messaging to Pi through a local socket.
-- Native host installer and diagnostic script.
+- Native host installer, uninstaller, and diagnostic script.
 - Build scripts for extension assets and native host output.
 - Test coverage for:
   - shared protocol validation
@@ -27,7 +27,7 @@ All notable changes to this project will be documented in this file.
   - extension URL restriction handling
   - native host message encoding and installer behavior
   - built output checks
-- Friendly project README with setup, architecture, and development workflow guidance.
+- Friendly project README with setup, architecture, cleanup, and development workflow guidance.
 
 ### Notes
 

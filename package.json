@@ -18,7 +18,8 @@
     "typecheck:pi": "tsgo -p apps/pi/tsconfig.json --noEmit",
     "typecheck:extension": "tsgo -p apps/extension/tsconfig.json --noEmit",
     "typecheck:native": "tsgo -p apps/native-host/tsconfig.json --noEmit",
-    "typecheck:shared": "tsgo -p packages/shared/tsconfig.json --noEmit"
+    "typecheck:shared": "tsgo -p packages/shared/tsconfig.json --noEmit",
+    "uninstall:native": "bash apps/native-host/install/uninstall.sh"
   },
   "dependencies": {
     "typebox": "^1.1.24"
