@@ -25,27 +25,6 @@ It's designed to be a practical starting point for browser-assisted Pi projects:
 - **A native messaging host** that bridges Chrome native messaging to Pi over a local socket.
 - **Build and test scripts** for each part of the project.
 
-## How the pieces talk
-
-```text
-Pi command/tool
-  -> apps/pi
-  -> local socket + token
-  -> apps/native-host
-  -> Chrome native messaging
-  -> apps/extension background
-  -> active tab content script
-  -> browser
-```
-
-The protocol lives in one place:
-
-```text
-packages/shared/src/messages.ts
-```
-
-Message types are created from TypeBox schemas, then reused across the Pi extension, native host, browser extension, and tests. If you add or change a message, start there.
-
 ## Requirements
 
 - Node.js available on your system path or through `fnm`/`nvm`.
