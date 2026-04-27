@@ -2,7 +2,14 @@
 
 **End-to-end type-safe template for Pi-powered Chrome/Chromium extensions.**
 
+
+## TL;DR: 30-second walkthrough
+
+Quick demo of the full Pi → browser flow:
+
+https://github.com/user-attachments/assets/c4a042e4-ad33-4af5-b1ea-07e5781418e9
 ## Overview
+---
 
 pi-browser-template is a focused repo template for projects that need Pi to talk to a browser.
 It gives you a clean, working path from a Pi command or tool call, through a native messaging host, into a Chrome/Chromium extension, and back again.
