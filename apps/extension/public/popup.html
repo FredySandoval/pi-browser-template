@@ -3,15 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    html,
     body {
       box-sizing: border-box;
-      min-width: 420px;
-      padding: 12px;
+      margin: 0;
+      width: min(420px, 100vw);
+      min-width: 280px;
+      max-width: 420px;
     }
 
-    textarea {
-      box-sizing: border-box;
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+    }
+
+    body {
+      padding: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    button,
+    textarea,
+    pre {
+      max-width: 100%;
+    }
+
+    textarea,
+    pre {
       font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 320px) {
+      body {
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
