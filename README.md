@@ -1,27 +1,37 @@
-#  pi-browser-template
+# pi-browser-template
 
-**End-to-end type-safe template for Pi-powered Chrome/Chromium extensions.**
+**Build Pi-powered Chrome/Chromium extensions with end-to-end type-safe native messaging.**
 
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![pnpm](https://img.shields.io/badge/pnpm-orange?logo=pnpm&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178c6.svg)
+![Chrome](https://img.shields.io/badge/Chrome-4285F4?logo=googlechrome&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-0078D4?logo=quarto&logoColor=white)
+![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
 
-## TL;DR: 30-second walkthrough
+`pi-browser-template` is a working starter kit for developers building Pi extensions that need to control or communicate with a browser. It wires together a Pi command/tool, a local native messaging host, a Chrome/Chromium extension, and shared runtime-validated TypeScript protocol messages.
 
-Quick demo of the full Pi → browser flow:
+If this template saves you setup time, consider starring it so you can find it again later.
 
-https://github.com/user-attachments/assets/c4a042e4-ad33-4af5-b1ea-07e5781418e9
-## Overview
----
+## Demo
 
-pi-browser-template is a focused repo template for projects that need Pi to talk to a browser.
-It gives you a clean, working path from a Pi command or tool call, through a native messaging host, into a Chrome/Chromium extension, and back again.
+Quick walkthrough of the full Pi → native host → browser flow:
 
-It's designed to be a practical starting point for browser-assisted Pi projects: small enough to understand quickly, but complete enough to build on without redoing the wiring.
+<a href="https://github.com/user-attachments/assets/c4a042e4-ad33-4af5-b1ea-07e5781418e9"><img width="960" height="540" alt="demo" src="https://github.com/user-attachments/assets/1883c43b-2280-4ef6-845d-ae77c134481b" /></a>
+
+## Why this exists
+
+Browser-assisted AI tools usually need several moving pieces to work together: an agent extension, a browser extension, native messaging, content scripts, local sockets, and protocol validation. Getting that wiring correct is tedious and easy to break.
+
+This repository gives you a small, understandable, tested baseline so you can start from working infrastructure instead of rebuilding the bridge from scratch.
 
 ## What you get
 
-- **End-to-end type safety** from Pi, to the native host, to the extension.
-- **Shared protocol types and runtime schemas** in `packages/shared`.
-- **A Pi extension** that registers a command and a tool.
-- **A Chrome extension** with a popup, background service worker, and content script.
+- **End-to-end type safety** from Pi to the browser extension.
+- **Shared TypeBox schemas** and TypeScript protocol types in `packages/shared`.
+- **A Pi extension** that registers both a command and a tool.
+- **A Chrome/Chromium extension** with popup, background service worker, and content script.
 - **A native messaging host** that bridges Chrome native messaging to Pi over a local socket.
 - **Build and test scripts** for each part of the project.
 
