@@ -95,6 +95,8 @@ Chrome may need to be fully restarted after installing the native host in window
 
 Open the extension popup in Chrome. It will show whether Chrome can reach the native host.
 
+<img width="302" height="131" alt="image" src="https://github.com/user-attachments/assets/88f85a63-a24c-4f19-8db1-299b27ba7a16" />
+
 You can also run:
 
 ```bash
