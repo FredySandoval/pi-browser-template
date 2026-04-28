@@ -4,9 +4,10 @@ type NativeMessage = ProtocolMessage;
 
 export function encodeNativeMessage(message: NativeMessage): Buffer {
   const json = JSON.stringify(message);
+  const payload = Buffer.from(json, "utf8");
   const length = Buffer.alloc(4);
-  length.writeUInt32LE(json.length);
-  return Buffer.concat([length, Buffer.from(json)]);
+  length.writeUInt32LE(payload.length);
+  return Buffer.concat([length, payload]);
 }
 
 export function redactForLog(message: NativeMessage): string {

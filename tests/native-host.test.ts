@@ -4,14 +4,44 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import { encodeNativeMessage, redactForLog } from "../apps/native-host/src/native-utils.cts";
+import { getRuntimePaths } from "../packages/shared/src/runtime-paths.ts";
 
 describe("encodeNativeMessage", () => {
-  test("prefixes the JSON payload with a little-endian byte length", () => {
-    const encoded = encodeNativeMessage({ type: "PING" });
-    const json = JSON.stringify({ type: "PING" });
+  test("prefixes the JSON payload with a little-endian UTF-8 byte length", () => {
+    const message = { type: "CANVAS_ERROR", reason: "é" } as never;
+    const encoded = encodeNativeMessage(message);
+    const json = JSON.stringify(message);
+    const payload = Buffer.from(json, "utf8");
 
-    expect(encoded.readUInt32LE(0)).toBe(json.length);
+    expect(encoded.readUInt32LE(0)).toBe(payload.length);
     expect(encoded.subarray(4).toString()).toBe(json);
+  });
+});
+
+describe("getRuntimePaths", () => {
+  test("uses named pipe and LOCALAPPDATA on Windows", () => {
+    const oldLocalAppData = process.env.LOCALAPPDATA;
+    process.env.LOCALAPPDATA = "C:\\Users\\Test\\AppData\\Local";
+
+    try {
+      const paths = getRuntimePaths("pi-browser-template", "win32");
+
+      expect(paths.ipcPath).toBe("\\\\.\\pipe\\pi-browser-template");
+      expect(paths.tokenPath).toContain("C:\\Users\\Test\\AppData\\Local");
+      expect(paths.tokenPath).toContain("pi-browser-template.token");
+      expect(paths.logPath).toContain("pi-browser-template-host.log");
+    } finally {
+      if (oldLocalAppData === undefined) delete process.env.LOCALAPPDATA;
+      else process.env.LOCALAPPDATA = oldLocalAppData;
+    }
+  });
+
+  test("keeps existing Unix socket and token paths on non-Windows platforms", () => {
+    const paths = getRuntimePaths("pi-browser-template", "linux");
+
+    expect(paths.ipcPath).toBe("/tmp/pi-browser-template.sock");
+    expect(paths.tokenPath).toBe("/tmp/pi-browser-template.token");
+    expect(paths.logPath).toBe("/tmp/pi-browser-template-host.log");
   });
 });
 
@@ -54,6 +84,7 @@ describe("native host installer", () => {
     writeFileSync(join(sourceConfigDir, "config.ts"), 'export const extensionConfig = { nativeHostName: "com.pi.pi_browser_template" } as const;\n');
     writeFileSync(join(builtNativeDir, "host.cjs"), "#!/usr/bin/env node\n");
     writeFileSync(join(builtNativeDir, "native-utils.cjs"), "module.exports = {};\n");
+    writeFileSync(join(builtNativeDir, "runtime-paths.cjs"), "module.exports = {};\n");
 
     const configPath = join(builtExtensionDir, "config.js");
     const manifestPath = join(builtExtensionDir, "manifest.json");
@@ -82,6 +113,7 @@ describe("native host installer", () => {
     expect(existsSync(join(xdgData, "pi-browser-template/package.json"))).toBe(true);
     expect(existsSync(join(stableNativeDir, "host.cjs"))).toBe(true);
     expect(existsSync(join(stableNativeDir, "native-utils.cjs"))).toBe(true);
+    expect(existsSync(join(stableNativeDir, "runtime-paths.cjs"))).toBe(true);
     expect(existsSync(wrapper)).toBe(true);
     expect(manifestJson.path).toBe(wrapper);
     expect(manifestJson.path).not.toContain("dist");

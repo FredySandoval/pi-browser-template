@@ -29,9 +29,22 @@ describe("built native host", () => {
   test("includes installer artifacts and local dependencies required by host.cjs", () => {
     expect(existsSync(`${extensionDir}/native/install.sh`)).toBe(true);
     expect(existsSync(`${extensionDir}/native/diagnose.sh`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/uninstall.sh`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/install.ps1`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/diagnose.ps1`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/uninstall.ps1`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/host.cmd`)).toBe(true);
     expect(existsSync(`${extensionDir}/native/host.cjs`)).toBe(true);
     expect(existsSync(`${extensionDir}/native/native-utils.cjs`)).toBe(true);
+    expect(existsSync(`${extensionDir}/native/runtime-paths.cjs`)).toBe(true);
     expect(existsSync(`${extensionDir}/native/host-wrapper.sh`)).toBe(false);
+  });
+
+  test("Windows installer registers Chrome native messaging host in HKCU", () => {
+    const installScript = readFileSync("apps/native-host/install/install.ps1", "utf8");
+
+    expect(installScript).toContain("HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts");
+    expect(installScript).toContain("reg add");
   });
 
   test("starts without missing module errors", () => {

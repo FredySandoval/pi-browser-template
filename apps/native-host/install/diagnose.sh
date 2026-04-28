@@ -20,10 +20,21 @@ if [ ! -f "$ROOT_DIR/package.json" ]; then
   exit 1
 fi
 
-PACKAGE_NAME="$(node -p "require('$ROOT_DIR/package.json').name" 2>/dev/null)"
+node_path() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    printf '%s' "$1"
+  fi
+}
+
+PACKAGE_JSON_NODE="$(node_path "$ROOT_DIR/package.json")"
+ROOT_DIR_NODE="$(node_path "$ROOT_DIR")"
+
+PACKAGE_NAME="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node -p "require(process.env.PACKAGE_JSON_NODE).name" 2>/dev/null)"
 PACKAGE_SLUG="$(printf '%s' "$PACKAGE_NAME" | sed 's#^@[^/]*/##' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_]/_/g')"
-PACKAGE_TITLE="$(node - <<EOF
-const name = require('$ROOT_DIR/package.json').name;
+PACKAGE_TITLE="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node - <<'EOF'
+const name = require(process.env.PACKAGE_JSON_NODE).name;
 console.log(name.replace(/^@[^/]+\//, '').split(/[-_\s]+/).filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join(' '));
 EOF
 )"
@@ -52,10 +63,12 @@ EXPECTED_PACKAGE="$APP_DATA_DIR/package.json"
 EXPECTED_WRAPPER="$NATIVE_INSTALL_DIR/host-wrapper.sh"
 EXPECTED_HOST="$NATIVE_INSTALL_DIR/host.cjs"
 EXPECTED_UTILS="$NATIVE_INSTALL_DIR/native-utils.cjs"
+EXPECTED_RUNTIME_PATHS="$NATIVE_INSTALL_DIR/runtime-paths.cjs"
 
 [ -f "$EXPECTED_PACKAGE" ] && pass "stable package metadata exists: $EXPECTED_PACKAGE" || fail "stable package metadata missing: $EXPECTED_PACKAGE"
 [ -f "$EXPECTED_HOST" ] && pass "stable host exists: $EXPECTED_HOST" || fail "stable host missing: $EXPECTED_HOST"
 [ -f "$EXPECTED_UTILS" ] && pass "stable native-utils exists: $EXPECTED_UTILS" || fail "stable native-utils missing: $EXPECTED_UTILS"
+[ -f "$EXPECTED_RUNTIME_PATHS" ] && pass "stable runtime-paths exists: $EXPECTED_RUNTIME_PATHS" || fail "stable runtime-paths missing: $EXPECTED_RUNTIME_PATHS"
 [ -x "$EXPECTED_WRAPPER" ] && pass "wrapper is executable: $EXPECTED_WRAPPER" || fail "wrapper missing or not executable: $EXPECTED_WRAPPER"
 
 if [ -f "$EXPECTED_WRAPPER" ]; then
@@ -66,12 +79,14 @@ if [ -f "$EXPECTED_WRAPPER" ]; then
   fi
 fi
 
-CONFIG_HOST_NAME="$(node - <<EOF
+CONFIG_HOST_NAME="$(ROOT_DIR_NODE="$ROOT_DIR_NODE" node - <<'EOF'
 const fs = require('fs');
+const path = require('path');
+const root = process.env.ROOT_DIR_NODE;
 const paths = [
-  '$ROOT_DIR/apps/extension/src/config.ts',
-  '$ROOT_DIR/chrome-extension/config.js',
-  '$ROOT_DIR/dist/chrome-extension/config.js',
+  path.join(root, 'apps/extension/src/config.ts'),
+  path.join(root, 'chrome-extension/config.js'),
+  path.join(root, 'dist/chrome-extension/config.js'),
 ];
 for (const file of paths) {
   if (!fs.existsSync(file)) continue;
@@ -95,14 +110,16 @@ for MANIFEST_DIR in "${MANIFEST_DIRS[@]}"; do
   fi
   pass "manifest exists: $MANIFEST_PATH"
 
-  CHECK_OUTPUT="$(node - <<EOF 2>&1
+  MANIFEST_PATH_NODE="$(node_path "$MANIFEST_PATH")"
+  EXPECTED_WRAPPER_NODE="$(node_path "$EXPECTED_WRAPPER")"
+  CHECK_OUTPUT="$(MANIFEST_PATH_NODE="$MANIFEST_PATH_NODE" HOST_NAME="$HOST_NAME" EXPECTED_WRAPPER_NODE="$EXPECTED_WRAPPER_NODE" EXTENSION_ID="$EXTENSION_ID" node - <<'EOF' 2>&1
 const fs = require('fs');
-const manifest = JSON.parse(fs.readFileSync('$MANIFEST_PATH', 'utf8'));
-if (manifest.name !== '$HOST_NAME') throw new Error('name mismatch: ' + manifest.name);
-if (manifest.path !== '$EXPECTED_WRAPPER') throw new Error('path mismatch: ' + manifest.path);
+const manifest = JSON.parse(fs.readFileSync(process.env.MANIFEST_PATH_NODE, 'utf8'));
+if (manifest.name !== process.env.HOST_NAME) throw new Error('name mismatch: ' + manifest.name);
+if (manifest.path !== process.env.EXPECTED_WRAPPER_NODE) throw new Error('path mismatch: ' + manifest.path);
 if (manifest.type !== 'stdio') throw new Error('type mismatch: ' + manifest.type);
-if ('$EXTENSION_ID' && !manifest.allowed_origins?.includes('chrome-extension://$EXTENSION_ID/')) {
-  throw new Error('allowed origin missing: chrome-extension://$EXTENSION_ID/');
+if (process.env.EXTENSION_ID && !manifest.allowed_origins?.includes(`chrome-extension://${process.env.EXTENSION_ID}/`)) {
+  throw new Error(`allowed origin missing: chrome-extension://${process.env.EXTENSION_ID}/`);
 }
 EOF
 )"

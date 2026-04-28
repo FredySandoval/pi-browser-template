@@ -4,20 +4,27 @@ import fs = require("node:fs");
 import path = require("node:path");
 import crypto = require("node:crypto");
 import { encodeNativeMessage, redactForLog } from "./native-utils.cjs";
+import { getRuntimePaths } from "./runtime-paths.cjs";
 import type { ProtocolMessage } from "../../../packages/shared/src/protocol";
 
 type NativeMessage = ProtocolMessage;
 
 const packageJson = readPackageJson();
-const packageName = packageJson.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-const SOCKET_PATH = `/tmp/${packageName}.sock`;
-const TOKEN_PATH = `/tmp/${packageName}.token`;
-const LOG_FILE = `/tmp/${packageName}-host.log`;
+const runtimePaths = getRuntimePaths(packageJson.name);
+const SOCKET_PATH = runtimePaths.ipcPath;
+const TOKEN_PATH = runtimePaths.tokenPath;
+const LOG_FILE = runtimePaths.logPath;
 const MAX_NATIVE_MESSAGE_BYTES = 32 * 1024 * 1024;
 const MAX_SOCKET_BUFFER = 32 * 1024 * 1024;
 const MAX_LOG_BYTES = 5 * 1024 * 1024;
 
 process.umask(0o077);
+
+try {
+  fs.mkdirSync(runtimePaths.appDataDir, { recursive: true });
+} catch (err) {
+  reportFsError(`Failed to create runtime directory ${runtimePaths.appDataDir}`, err);
+}
 
 function readPackageJson(): { name: string } {
   const packagePaths = [
@@ -55,10 +62,12 @@ function log(message: string): void {
 
 log("Host starting...");
 
-try {
-  fs.unlinkSync(SOCKET_PATH);
-} catch (err) {
-  reportFsError(`Failed to remove old socket ${SOCKET_PATH}`, err);
+if (process.platform !== "win32") {
+  try {
+    fs.unlinkSync(SOCKET_PATH);
+  } catch (err) {
+    reportFsError(`Failed to remove old socket ${SOCKET_PATH}`, err);
+  }
 }
 
 let piSocket: net.Socket | null = null;
@@ -132,10 +141,12 @@ process.stdin.on("end", () => {
 });
 
 function cleanup(): never {
-  try {
-    fs.unlinkSync(SOCKET_PATH);
-  } catch (err) {
-    reportFsError(`Failed to remove socket ${SOCKET_PATH}`, err);
+  if (process.platform !== "win32") {
+    try {
+      fs.unlinkSync(SOCKET_PATH);
+    } catch (err) {
+      reportFsError(`Failed to remove socket ${SOCKET_PATH}`, err);
+    }
   }
 
   try {
@@ -226,9 +237,11 @@ const server = net.createServer((socket) => {
 
 server.listen(SOCKET_PATH, () => {
   log(`Listening on ${SOCKET_PATH}`);
-  try {
-    fs.chmodSync(SOCKET_PATH, 0o600);
-  } catch (err) {
-    reportFsError(`Failed to chmod socket ${SOCKET_PATH}`, err);
+  if (process.platform !== "win32") {
+    try {
+      fs.chmodSync(SOCKET_PATH, 0o600);
+    } catch (err) {
+      reportFsError(`Failed to chmod socket ${SOCKET_PATH}`, err);
+    }
   }
 });

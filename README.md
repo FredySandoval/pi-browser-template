@@ -61,6 +61,8 @@ dist/chrome-extension
 
 ## Install the native host
 
+### macOS/Linux
+
 Copy the command from the extension
 
 <img width="619" height="216" alt="image" src="https://github.com/user-attachments/assets/591efeed-4390-4d3d-a607-10ea91872e69" />
@@ -75,6 +77,34 @@ The installer writes the native messaging manifest for Chrome/Chromium and allow
 
 You usually do **not** need to rerun this after rebuilding or reloading the extension, unless the extension ID changes.
 
+### Windows
+
+Build first:
+
+```powershell
+pnpm build
+```
+
+Load the unpacked extension from:
+
+```text
+dist/chrome-extension
+```
+
+Copy the extension ID from `chrome://extensions`, then run PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File apps/native-host/install/install.ps1 <extension-id>
+```
+
+The Windows installer copies the native host under `%LOCALAPPDATA%\pi-browser-template\native` and registers:
+
+```text
+HKCU\Software\Google\Chrome\NativeMessagingHosts\com.pi.pi_browser_template
+```
+
+Chrome may need to be fully restarted after installing the native host.
+
 ## Check the connection
 
 Open the extension popup in Chrome. It will show whether Chrome can reach the native host.
@@ -83,6 +113,18 @@ You can also run:
 
 ```bash
 pnpm diagnose:native
+```
+
+On Windows, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File apps/native-host/install/diagnose.ps1 <extension-id>
+```
+
+To uninstall on Windows:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File apps/native-host/install/uninstall.ps1
 ```
 
 ## Install in Pi for local development
@@ -176,9 +218,11 @@ pnpm build             # build extension + native host and copy assets
 pnpm test              # run tests and type checks
 pnpm test:build        # build, then test the output
 pnpm typecheck         # typecheck every workspace part
-pnpm diagnose:native   # inspect native host installation
-pnpm uninstall:native  # remove native host manifests, installed files, and temp files
-pnpm clean             # remove dist/
+pnpm diagnose:native      # inspect macOS/Linux native host installation
+pnpm uninstall:native     # remove macOS/Linux native host manifests, installed files, and temp files
+pnpm diagnose:native:win  # inspect Windows native host installation
+pnpm uninstall:native:win # remove Windows native host registry key and installed files
+pnpm clean                # remove dist/
 ```
 
 ## Project map
@@ -221,7 +265,7 @@ chrome://extensions
 
 - Chrome native messaging requires an installed host manifest that lists your extension ID.
 - Some browser pages are restricted and cannot receive content scripts.
-- The native host writes a local token and socket path under `/tmp` using the package name.
+- The native host uses `/tmp` socket/token/log paths on macOS/Linux and a named pipe plus `%LOCALAPPDATA%` token/log files on Windows.
 - Keep the shared protocol small. A few clear messages are easier to evolve than one large catch-all message.
 
 ## License

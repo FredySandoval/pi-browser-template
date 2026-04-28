@@ -13,6 +13,11 @@ copyFile(path.join(publicDir, "popup.html"), path.join(target, "popup.html"));
 copyDir(path.join(publicDir, "icons"), path.join(target, "icons"));
 copyFile(path.join(root, "apps", "native-host", "install", "install.sh"), path.join(target, "native", "install.sh"));
 copyFile(path.join(root, "apps", "native-host", "install", "diagnose.sh"), path.join(target, "native", "diagnose.sh"));
+copyFile(path.join(root, "apps", "native-host", "install", "uninstall.sh"), path.join(target, "native", "uninstall.sh"));
+copyFile(path.join(root, "apps", "native-host", "install", "install.ps1"), path.join(target, "native", "install.ps1"));
+copyFile(path.join(root, "apps", "native-host", "install", "diagnose.ps1"), path.join(target, "native", "diagnose.ps1"));
+copyFile(path.join(root, "apps", "native-host", "install", "uninstall.ps1"), path.join(target, "native", "uninstall.ps1"));
+copyFile(path.join(root, "apps", "native-host", "install", "host.cmd"), path.join(target, "native", "host.cmd"));
 copyFile(path.join(compiled, "apps", "extension", "src", "background.js"), path.join(target, "background.js"));
 copyFile(path.join(compiled, "apps", "extension", "src", "browser-utils.js"), path.join(target, "browser-utils.js"));
 copyFile(path.join(compiled, "apps", "extension", "src", "config.js"), path.join(target, "config.js"));
@@ -20,12 +25,14 @@ copyFile(path.join(compiled, "apps", "extension", "src", "content.js"), path.joi
 copyFile(path.join(compiled, "apps", "extension", "src", "popup.js"), path.join(target, "popup.js"));
 copyFile(path.join(compiled, "apps", "native-host", "src", "host.cjs"), path.join(target, "native", "host.cjs"));
 copyFile(path.join(compiled, "apps", "native-host", "src", "native-utils.cjs"), path.join(target, "native", "native-utils.cjs"));
+copyFile(path.join(compiled, "apps", "native-host", "src", "runtime-paths.cjs"), path.join(target, "native", "runtime-paths.cjs"));
 
 stripEmptyModuleExport(path.join(target, "background.js"));
 stripEmptyModuleExport(path.join(target, "content.js"));
 stripEmptyModuleExport(path.join(target, "popup.js"));
 chmodExecutable(path.join(target, "native", "install.sh"));
 chmodExecutable(path.join(target, "native", "diagnose.sh"));
+chmodExecutable(path.join(target, "native", "uninstall.sh"));
 chmodExecutable(path.join(target, "native", "host.cjs"));
 
 function copyFile(from, to) {

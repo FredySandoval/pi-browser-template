@@ -14,10 +14,20 @@ if [ ! -f "$ROOT_DIR/package.json" ]; then
   exit 1
 fi
 
-PACKAGE_NAME="$(node -p "require('$ROOT_DIR/package.json').name")"
+node_path() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    printf '%s' "$1"
+  fi
+}
+
+PACKAGE_JSON_NODE="$(node_path "$ROOT_DIR/package.json")"
+
+PACKAGE_NAME="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node -p "require(process.env.PACKAGE_JSON_NODE).name")"
 PACKAGE_SLUG="$(printf '%s' "$PACKAGE_NAME" | sed 's#^@[^/]*/##' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_]/_/g')"
-PACKAGE_TITLE="$(node - <<EOF
-const name = require('$ROOT_DIR/package.json').name;
+PACKAGE_TITLE="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node - <<'EOF'
+const name = require(process.env.PACKAGE_JSON_NODE).name;
 console.log(name.replace(/^@[^/]+\//, '').split(/[-_\s]+/).filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join(' '));
 EOF
 )"

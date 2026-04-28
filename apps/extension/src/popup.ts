@@ -2,7 +2,7 @@ import type { ConnectionResult } from "../../../packages/shared/src/protocol.js"
 
 const extensionName = chrome.runtime.getManifest().name;
 const extensionId = chrome.runtime.id;
-const installCommand = `apps/native-host/install/install.sh ${extensionId}`;
+const installCommand = getInstallCommand(extensionId);
 
 const extensionNameHeading = mustGetElement<HTMLElement>("extension-name");
 const installCommandInput = mustGetElement<HTMLTextAreaElement>("install-cmd");
@@ -13,11 +13,14 @@ const readySection = mustGetElement<HTMLElement>("ready-section");
 const troubleSection = mustGetElement<HTMLElement>("trouble-section");
 const troubleDetail = mustGetElement<HTMLElement>("trouble-detail");
 const quitTip = mustGetElement<HTMLElement>("quit-tip");
+const windowsInstallNote = mustGetElement<HTMLElement>("windows-install-note");
 
 extensionNameHeading.textContent = extensionName;
 installCommandInput.value = installCommand;
 
 const isMac = isMacPlatform();
+const isWindows = isWindowsPlatform();
+windowsInstallNote.hidden = !isWindows;
 quitTip.textContent = isMac
   ? "Fully quit the supported browser (⌘Q) and reopen"
   : "Fully quit the supported browser (menu → Exit) and reopen";
@@ -39,12 +42,26 @@ function copyToClipboard(text: string): void {
   navigator.clipboard.writeText(text);
 }
 
-function isMacPlatform(): boolean {
+function getPlatformText(): string {
   const navigatorWithUserAgentData = navigator as Navigator & {
     userAgentData?: { platform?: string };
   };
-  const platform = navigatorWithUserAgentData.userAgentData?.platform || navigator.userAgent;
-  return platform.toUpperCase().includes("MAC");
+  return navigatorWithUserAgentData.userAgentData?.platform || navigator.userAgent;
+}
+
+function isMacPlatform(): boolean {
+  return getPlatformText().toUpperCase().includes("MAC");
+}
+
+function isWindowsPlatform(): boolean {
+  return getPlatformText().toUpperCase().includes("WIN");
+}
+
+function getInstallCommand(id: string): string {
+  if (isWindowsPlatform()) {
+    return `powershell -ExecutionPolicy Bypass -File apps/native-host/install/install.ps1 ${id}`;
+  }
+  return `bash apps/native-host/install/install.sh ${id}`;
 }
 
 async function checkConnection(): Promise<void> {

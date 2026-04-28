@@ -9,17 +9,18 @@ import type {
   SessionReplacedMessage,
 } from "../../../packages/shared/src/protocol.js";
 import type { PiContext } from "../../../packages/shared/src/pi.js";
+import { getRuntimePaths } from "../../../packages/shared/src/runtime-paths.js";
 import { isHostMessage } from "./host-message.js";
-import { safeName, safeToolName, toTitle } from "./names.js";
+import { safeToolName, toTitle } from "./names.js";
 import * as net from "node:net";
 import * as fs from "node:fs";
 
 const packageJson = JSON.parse(fs.readFileSync(new URL("../../../package.json", import.meta.url), "utf8"));
 const packageName = packageJson.name;
 const packageTitle = toTitle(packageName);
-const socketName = safeName(packageName);
-const SOCKET_PATH = `/tmp/${socketName}.sock`;
-const TOKEN_PATH = `/tmp/${socketName}.token`;
+const runtimePaths = getRuntimePaths(packageName);
+const SOCKET_PATH = runtimePaths.ipcPath;
+const TOKEN_PATH = runtimePaths.tokenPath;
 const MAX_SOCKET_BUFFER = 8 * 1024 * 1024;
 const CANVAS_READY_TIMEOUT_MS = 5000;
 

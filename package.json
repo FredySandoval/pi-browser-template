@@ -13,13 +13,15 @@
     "test": "bun test tests/pi.test.ts tests/native-host.test.ts tests/extension.test.ts tests/protocol.test.ts && pnpm typecheck",
     "test:build": "pnpm build && bun test tests/build-output.test.ts",
     "diagnose:native": "bash apps/native-host/install/diagnose.sh",
+    "diagnose:native:win": "powershell -ExecutionPolicy Bypass -File apps/native-host/install/diagnose.ps1",
     "typecheck": "pnpm typecheck:pi && pnpm typecheck:extension && pnpm typecheck:native && pnpm typecheck:shared && pnpm typecheck:tests",
     "typecheck:tests": "tsgo -p tests/tsconfig.json --noEmit",
     "typecheck:pi": "tsgo -p apps/pi/tsconfig.json --noEmit",
     "typecheck:extension": "tsgo -p apps/extension/tsconfig.json --noEmit",
     "typecheck:native": "tsgo -p apps/native-host/tsconfig.json --noEmit",
     "typecheck:shared": "tsgo -p packages/shared/tsconfig.json --noEmit",
-    "uninstall:native": "bash apps/native-host/install/uninstall.sh"
+    "uninstall:native": "bash apps/native-host/install/uninstall.sh",
+    "uninstall:native:win": "powershell -ExecutionPolicy Bypass -File apps/native-host/install/uninstall.ps1"
   },
   "dependencies": {
     "typebox": "^1.1.24"

@@ -21,6 +21,17 @@ if [ ! -f "$ROOT_DIR/package.json" ]; then
   exit 1
 fi
 
+node_path() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    printf '%s' "$1"
+  fi
+}
+
+PACKAGE_JSON_NODE="$(node_path "$ROOT_DIR/package.json")"
+ROOT_DIR_NODE="$(node_path "$ROOT_DIR")"
+
 BUILT_NATIVE_DIR="$ROOT_DIR/dist/chrome-extension/native"
 if [ ! -f "$BUILT_NATIVE_DIR/host.cjs" ] && [ -f "$INSTALL_SCRIPT_DIR/host.cjs" ]; then
   BUILT_NATIVE_DIR="$INSTALL_SCRIPT_DIR"
@@ -28,29 +39,33 @@ fi
 
 HOST_SOURCE="$BUILT_NATIVE_DIR/host.cjs"
 UTILS_SOURCE="$BUILT_NATIVE_DIR/native-utils.cjs"
-if [ ! -f "$HOST_SOURCE" ] || [ ! -f "$UTILS_SOURCE" ]; then
+RUNTIME_PATHS_SOURCE="$BUILT_NATIVE_DIR/runtime-paths.cjs"
+if [ ! -f "$HOST_SOURCE" ] || [ ! -f "$UTILS_SOURCE" ] || [ ! -f "$RUNTIME_PATHS_SOURCE" ]; then
   echo "Error: built native host files not found. Run pnpm build first."
   echo "Expected:"
   echo "  $HOST_SOURCE"
   echo "  $UTILS_SOURCE"
+  echo "  $RUNTIME_PATHS_SOURCE"
   exit 1
 fi
 
-PACKAGE_NAME="$(node -p "require('$ROOT_DIR/package.json').name")"
+PACKAGE_NAME="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node -p "require(process.env.PACKAGE_JSON_NODE).name")"
 PACKAGE_SLUG="$(printf '%s' "$PACKAGE_NAME" | sed 's#^@[^/]*/##' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_]/_/g')"
-PACKAGE_TITLE="$(node - <<EOF
-const name = require('$ROOT_DIR/package.json').name;
+PACKAGE_TITLE="$(PACKAGE_JSON_NODE="$PACKAGE_JSON_NODE" node - <<'EOF'
+const name = require(process.env.PACKAGE_JSON_NODE).name;
 console.log(name.replace(/^@[^/]+\//, '').split(/[-_\s]+/).filter(Boolean).map(word => word[0].toUpperCase() + word.slice(1)).join(' '));
 EOF
 )"
 HOST_NAME="com.pi.$PACKAGE_SLUG"
 
-CONFIG_HOST_NAME="$(node - <<EOF
+CONFIG_HOST_NAME="$(ROOT_DIR_NODE="$ROOT_DIR_NODE" node - <<'EOF'
 const fs = require('fs');
+const path = require('path');
+const root = process.env.ROOT_DIR_NODE;
 const paths = [
-  '$ROOT_DIR/apps/extension/src/config.ts',
-  '$ROOT_DIR/chrome-extension/config.js',
-  '$ROOT_DIR/dist/chrome-extension/config.js',
+  path.join(root, 'apps/extension/src/config.ts'),
+  path.join(root, 'chrome-extension/config.js'),
+  path.join(root, 'dist/chrome-extension/config.js'),
 ];
 for (const file of paths) {
   if (!fs.existsSync(file)) continue;
@@ -96,12 +111,15 @@ fi
 NATIVE_INSTALL_DIR="$APP_DATA_DIR/native"
 HOST_SCRIPT="$NATIVE_INSTALL_DIR/host.cjs"
 UTILS_SCRIPT="$NATIVE_INSTALL_DIR/native-utils.cjs"
+RUNTIME_PATHS_SCRIPT="$NATIVE_INSTALL_DIR/runtime-paths.cjs"
 HOST_PATH="$NATIVE_INSTALL_DIR/host-wrapper.sh"
+HOST_PATH_NODE="$(node_path "$HOST_PATH")"
 
 mkdir -p "$NATIVE_INSTALL_DIR"
 cp "$ROOT_DIR/package.json" "$APP_DATA_DIR/package.json"
 cp "$HOST_SOURCE" "$HOST_SCRIPT"
 cp "$UTILS_SOURCE" "$UTILS_SCRIPT"
+cp "$RUNTIME_PATHS_SOURCE" "$RUNTIME_PATHS_SCRIPT"
 chmod +x "$HOST_SCRIPT"
 
 cat >"$HOST_PATH" <<EOF
@@ -131,16 +149,16 @@ INSTALLED_MANIFESTS=()
 for MANIFEST_DIR in "${MANIFEST_DIRS[@]}"; do
   mkdir -p "$MANIFEST_DIR"
   MANIFEST_PATH="$MANIFEST_DIR/$HOST_NAME.json"
-  cat >"$MANIFEST_PATH" <<EOF
-{
-  "name": "$HOST_NAME",
-  "description": "$PACKAGE_TITLE native messaging host",
-  "path": "$HOST_PATH",
-  "type": "stdio",
-  "allowed_origins": [
-    "chrome-extension://$EXTENSION_ID/"
-  ]
-}
+  MANIFEST_PATH="$MANIFEST_PATH" HOST_NAME="$HOST_NAME" PACKAGE_TITLE="$PACKAGE_TITLE" HOST_PATH="$HOST_PATH_NODE" EXTENSION_ID="$EXTENSION_ID" node - <<'EOF'
+const fs = require('fs');
+const manifest = {
+  name: process.env.HOST_NAME,
+  description: `${process.env.PACKAGE_TITLE} native messaging host`,
+  path: process.env.HOST_PATH,
+  type: 'stdio',
+  allowed_origins: [`chrome-extension://${process.env.EXTENSION_ID}/`],
+};
+fs.writeFileSync(process.env.MANIFEST_PATH, `${JSON.stringify(manifest, null, 2)}\n`);
 EOF
   INSTALLED_MANIFESTS+=("$MANIFEST_PATH")
 done
@@ -153,6 +171,7 @@ Installed native host files:
   $APP_DATA_DIR/package.json
   $HOST_SCRIPT
   $UTILS_SCRIPT
+  $RUNTIME_PATHS_SCRIPT
   $HOST_PATH
 
 Installed Chrome native messaging manifests:
