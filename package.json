@@ -34,13 +34,7 @@
     "typescript": "^5.8.3"
   },
   "keywords": [
-    "pi-package",
-    "pi",
-    "pi-coding-agent",
-    "chrome-extension",
-    "native-messaging",
-    "template",
-    "extension"
+    "pi-package"
   ],
   "files": [
     "apps/",
