@@ -18,7 +18,7 @@ If this template saves you setup time, consider starring it so you can find it a
 
 Quick walkthrough of the full Pi → native host → browser flow:
 
-<a href="https://github.com/user-attachments/assets/c4a042e4-ad33-4af5-b1ea-07e5781418e9"><img width="960" height="540" alt="demo" src="https://github.com/user-attachments/assets/1883c43b-2280-4ef6-845d-ae77c134481b" /></a>
+<img width="960" height="540" alt="584631065-1883c43b-2280-4ef6-845d-ae77c134481b" src="https://github.com/user-attachments/assets/e18e0146-30f8-4939-9270-302f971ddbc7" />
 
 ## Why this exists
 
