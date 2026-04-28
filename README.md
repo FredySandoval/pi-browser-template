@@ -42,7 +42,7 @@ This repository gives you a small, understandable, tested baseline so you can st
 - Chrome, Chrome for Testing, or Chromium.
 - Pi with this package loaded as a Pi extension.
 
-## Install dependencies
+## 1. Install dependencies
 
 ```bash
 pnpm install
@@ -67,9 +67,7 @@ This creates the browser extension and native host files under `dist/`.
 dist/chrome-extension
 ```
 
-5. Copy the generated extension ID from Chrome.
-
-## Install the native host
+## 2. Install the native host
 
 ### macOS/Linux
 
@@ -80,64 +78,34 @@ Copy the command from the extension
 Pass the Chrome extension ID to the installer:
 
 ```bash
+# MacOS/Linux
 bash apps/native-host/install/install.sh <extension-id>
+
+# Windows in powershell
+powershell -ExecutionPolicy Bypass -File apps/native-host/install/install.ps1 <extension-id>
 ```
 
 The installer writes the native messaging manifest for Chrome/Chromium and allows only your loaded extension origin.
 
 You usually do **not** need to rerun this after rebuilding or reloading the extension, unless the extension ID changes.
 
-### Windows
+Chrome may need to be fully restarted after installing the native host in windows.
 
-Build first:
-
-```powershell
-pnpm build
-```
-
-Load the unpacked extension from:
-
-```text
-dist/chrome-extension
-```
-
-Copy the extension ID from `chrome://extensions`, then run PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File apps/native-host/install/install.ps1 <extension-id>
-```
-
-The Windows installer copies the native host under `%LOCALAPPDATA%\pi-browser-template\native` and registers:
-
-```text
-HKCU\Software\Google\Chrome\NativeMessagingHosts\com.pi.pi_browser_template
-```
-
-Chrome may need to be fully restarted after installing the native host.
-
-## Check the connection
+## 3. Check the connection
 
 Open the extension popup in Chrome. It will show whether Chrome can reach the native host.
 
 You can also run:
 
 ```bash
+# MacOS/Linux
 pnpm diagnose:native
+
+# Windows
+pnpm diagnose:native:win
 ```
 
-On Windows, run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File apps/native-host/install/diagnose.ps1 <extension-id>
-```
-
-To uninstall on Windows:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File apps/native-host/install/uninstall.ps1
-```
-
-## Install in Pi for local development
+## 4. Install in Pi for local development
 
 From the parent folder of this repository, install the package into Pi with a local path:
 
@@ -145,15 +113,9 @@ From the parent folder of this repository, install the package into Pi with a lo
 pi install ./pi-browser-template
 ```
 
-If you are already inside this repository, use:
-
-```bash
-pi install .
-```
-
 After changing the Pi extension code, restart or reload Pi so it picks up the local package changes.
 
-## Use from Pi
+## 5. Use from Pi
 
 This package registers:
 
@@ -162,64 +124,11 @@ This package registers:
 
 The command/tool opens a blank browser window. You can optionally provide a URL.
 
-Example intent:
+Example prompt:
 
 ```text
-Open the browser window at https://example.com
+Can you run the tool pi-browser-template
 ```
-
-## Where to start changing things
-
-### Change the browser behavior
-
-Start here:
-
-```text
-apps/extension/src/content.ts
-apps/extension/src/background.ts
-```
-
-`content.ts` controls what happens inside the web page.  
-`background.ts` receives protocol messages and routes them to tabs or the native host.
-
-### Change the Pi command or tool
-
-Start here:
-
-```text
-apps/pi/src/index.ts
-```
-
-This file registers the Pi command and tool, opens the browser window, waits for a response, and reports status back to Pi.
-
-### Add new messages
-
-Start here:
-
-```text
-packages/shared/src/messages.ts
-packages/shared/src/protocol.ts
-packages/shared/src/validation.ts
-```
-
-Add the TypeBox schema, export its static TypeScript type, add it to the correct union, then use the shared type everywhere else.
-
-### Change the native host name
-
-The extension config must match the host manifest name:
-
-```text
-apps/extension/src/config.ts
-apps/extension/public/config.js
-```
-
-The current host name is:
-
-```text
-com.pi.pi_browser_template
-```
-
-If you rename the package, make sure the computed host name and extension config still match. The installer checks this for you.
 
 ## Useful scripts
 
@@ -260,7 +169,11 @@ scripts/              Build helper scripts
 To uninstall the native messaging host files created by `install.sh`, run:
 
 ```bash
+# MacOS/Linux
 pnpm uninstall:native
+
+# Windows
+pnpm uninstall:native:win
 ```
 
 This removes the Chrome/Chromium native messaging manifests, the installed native host directory, and this project's temporary socket/token/log files.
