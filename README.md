@@ -125,15 +125,12 @@ This installs the native messaging manifest for your browser and allows your ext
 
 If Chrome was already open, fully restart Chrome after this step.
 
-The native host setup screen may look like this:
-
-<img width="619" height="216" alt="image" src="https://github.com/user-attachments/assets/591efeed-4390-4d3d-a607-10ea91872e69" />
-
 ## 7. Check the connection
 
 Open the extension popup in Chrome. It should show whether the native host is connected.
 
-<img width="302" height="131" alt="image" src="https://github.com/user-attachments/assets/88f85a63-a24c-4f19-8db1-299b27ba7a16" />
+<img width="280" height="156" alt="image" src="https://github.com/user-attachments/assets/7cdfa9d2-5e28-451d-b4aa-16e44ca02acd" />
+
 
 ## 8. Install this package in Pi
 
