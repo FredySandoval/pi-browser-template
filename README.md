@@ -16,6 +16,25 @@ The template is **end-to-end type safe**: Pi, the native host, and the browser e
 
 The included example lets Pi show an `alert()` in the active browser tab.
 
+```txt
+├── apps/                          # Main runnable applications
+│   ├── browser-extension/         # WXT-based browser extension: background script, popup UI, icons, messaging utils
+│   ├── native-host/               # Native messaging host that connects the browser extension to the local system
+│   └── pi/                        # Pi/client-side app or library for defining commands, tools, and host communication
+│
+├── packages/                      # Shared internal packages used by the apps
+│   ├── env-wxt/                   # Environment/config helpers for WXT projects
+│   ├── native-messaging-schemas/  # Shared message schemas between browser, native host, and Pi
+│   ├── typescript-config/         # Shared TypeScript configuration presets
+│   └── wxt/                       # Shared WXT utilities/configuration
+│
+├── AGENTS.md                      # Notes/instructions for AI agents or contributors
+├── CHANGELOG.md                   # Release history
+├── LICENSE                        # Project license
+├── README.md                      # Main project documentation
+├── package.json                   # Root package scripts and workspace metadata
+└── pnpm-workspace.yaml            # pnpm workspace package definitions
+```
 ## What is included
 
 - `apps/pi` — Pi command and tool.
