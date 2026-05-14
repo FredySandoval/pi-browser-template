@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Changed
+
+- Refactored the project into a pnpm workspace with separate apps for the Pi extension, browser extension, and native host.
+- Rebuilt the browser extension on WXT with dedicated background, popup, messaging, runtime environment, and manifest configuration modules.
+- Replaced the previous blank browser canvas workflow with an active-tab `alert()` bridge from Pi to the browser.
+- Renamed and reorganized the shared protocol package into `packages/native-messaging-schemas`, with focused schemas for Pi-to-native-host, native-host-to-Pi, native-host-to-browser, and browser-to-native-host messages.
+- Centralized native bridge configuration for socket paths, token paths, Windows named pipes, and alert timeouts.
+- Split reusable TypeScript configuration into `packages/typescript-config` for browser and Node targets.
+
+### Added
+
+- Added `apps/pi` with an `alert-browser` command and `open_browser_alert` tool.
+- Added `apps/native-host` as a native messaging host plus local JSON-lines socket bridge for Pi communication.
+- Added token-based local socket authentication between Pi and the native host.
+- Added request/response correlation, alert timeout handling, and session replacement/error result messages.
+- Added `packages/env-wxt` for TypeBox-backed WXT/Vite environment validation.
+- Added `packages/wxt` helpers for WXT native host configuration keys.
+- Added browser-extension popup connection checks through `@webext-core/messaging`.
+- Added workspace-level `build`, `typecheck`, `dev`, and `native-host:setup` scripts.
+
+### Removed
+
+- Removed the old single-package/template structure in favor of app/package workspaces.
+- Removed the old browser canvas command/tool behavior.
+- Removed the previous `packages/shared` protocol package layout.
+
+### Breaking Changes
+
+- Pi usage now exposes `alert-browser` and `open_browser_alert` instead of the earlier browser canvas workflow.
+- Shared protocol imports must move from the old shared package to `@repo/native-messaging-schemas`.
+- Native host setup now uses the refactored `@repo/native-host` workspace and environment-driven WXT/native host configuration.
+
 ## 0.1.0 - 2026-04-25
 
 ### Added
