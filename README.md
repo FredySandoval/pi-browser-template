@@ -16,12 +16,6 @@ The template is **end-to-end type safe**: Pi, the native host, and the browser e
 
 The included example lets Pi show an `alert()` in the active browser tab.
 
-## Demo
-
-Quick walkthrough of the full Pi → native host → browser flow:
-
-<img width="960" height="540" alt="584631065-1883c43b-2280-4ef6-845d-ae77c134481b" src="https://github.com/user-attachments/assets/e18e0146-30f8-4939-9270-302f971ddbc7" />
-
 ## What is included
 
 - `apps/pi` — Pi command and tool.
