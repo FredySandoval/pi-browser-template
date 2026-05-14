@@ -12,6 +12,8 @@
 
 `pi-browser-template` is a small starter project for connecting a Pi extension to a browser extension through a native messaging host.
 
+The template is **end-to-end type safe**: Pi, the native host, and the browser extension all share validated message types.
+
 The included example lets Pi show an `alert()` in the active browser tab.
 
 ## Demo
@@ -26,6 +28,17 @@ Quick walkthrough of the full Pi → native host → browser flow:
 - `apps/browser-extension` — WXT Chrome/Chromium extension.
 - `apps/native-host` — native messaging host that connects Chrome to Pi.
 - `packages/native-messaging-schemas` — shared TypeBox message schemas and types.
+
+## Technologies used
+
+- **WXT** — builds and runs the browser extension.
+- **TypeScript** — end-to-end type-safe code across Pi, the native host, and the browser extension.
+- **pnpm workspaces** — manages the monorepo.
+- **Chrome Native Messaging** — lets the browser extension talk to the local native host.
+- **Node.js** — runs the native host.
+- **TypeBox** — shared runtime schemas and TypeScript types for messages.
+- **@webext-core/messaging** — simple typed messaging inside the browser extension.
+- **web-ext-native-msg** — installs the native messaging host manifest.
 
 ## Requirements
 
