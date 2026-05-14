@@ -1,0 +1,29 @@
+{
+  "name": "@repo/pi",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "git clean -xdf .cache dist node_modules"
+  },
+  "dependencies": {
+    "@repo/native-messaging-schemas": "workspace:*"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.74.0",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.6.0",
+    "typebox": "^1.1.37",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.31.0"
+}

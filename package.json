@@ -1,0 +1,32 @@
+{
+  "name": "pi-browser-template",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "license": "MIT",
+  "scripts": { 
+    "clean": "git clean -xdf .cache dist node_modules",
+    "build": "pnpm -r --if-present run build",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "dev": "pnpm --filter @repo/browser-extension dev",
+    "native-host:setup": "pnpm --filter @repo/native-host run setup"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "peerDependencies": {
+    "typebox": "*"
+  },
+  "keywords": [
+    "pi",
+    "pi-package",
+    "pi-extension",
+    "browser-extension"
+  ],
+  "pi": {
+   "extensions": ["./apps/pi/src/index.ts"]
+  },
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.31.0"
+}

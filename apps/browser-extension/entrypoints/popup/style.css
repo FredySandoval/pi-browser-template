@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 280px;
+  margin: 0;
+}
+
+.popup {
+  padding: 16px;
+}
+
+.native-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.status-dot--connected {
+  color: #16a34a;
+}
+
+.status-dot--disconnected {
+  color: #dc2626;
+}
+

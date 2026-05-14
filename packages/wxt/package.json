@@ -1,0 +1,21 @@
+{
+  "name": "@repo/wxt",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf .cache dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@repo/env-wxt": "workspace:*",
+    "@t3-oss/env-core": "^0.13.11",
+    "typebox": "^1.1.37"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.31.0"
+}

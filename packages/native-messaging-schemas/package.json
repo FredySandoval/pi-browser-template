@@ -1,0 +1,36 @@
+{
+  "name": "@repo/native-messaging-schemas",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
+    "./native-bridge-config": {
+      "types": "./src/native-bridge-config.ts",
+      "import": "./src/native-bridge-config.ts",
+      "require": "./dist/native-bridge-config.js",
+      "default": "./src/native-bridge-config.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "clean": "git clean -xdf dist node_modules"
+  },
+  "dependencies": {
+    "typebox": "^1.1.37"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.31.0"
+}

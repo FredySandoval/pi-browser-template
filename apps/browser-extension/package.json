@@ -1,0 +1,30 @@
+{
+  "name": "@repo/browser-extension",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "git clean -xdf .cache dist node_modules",
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.9.3",
+    "wxt": "^0.20.25"
+  },
+  "packageManager": "pnpm@10.31.0",
+  "dependencies": {
+    "@repo/env-wxt": "workspace:*",
+    "@repo/native-messaging-schemas": "workspace:*",
+    "@repo/wxt": "workspace:*",
+    "@t3-oss/env-core": "^0.13.11",
+    "@webext-core/messaging": "^2.3.0"
+  }
+}

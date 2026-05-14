@@ -1,0 +1,7 @@
+{
+  "extends": ["@repo/typescript-config/browser.json", "./.wxt/tsconfig.json"],
+  "exclude": [
+    "node_modules",
+    "dir"
+  ]
+}

@@ -1,143 +1,97 @@
 # Project files:
 
-```
-apps/extension/public/config.js
-apps/extension/public/icons/icon128.png
-apps/extension/public/icons/icon16.png
-apps/extension/public/icons/icon48.png
-apps/extension/public/manifest.json
-apps/extension/public/popup.html
-apps/extension/src/background.ts
-apps/extension/src/browser-utils.ts
-apps/extension/src/config.ts
-apps/extension/src/content.ts
-apps/extension/src/popup.ts
-apps/extension/tsconfig.json
-apps/native-host/install/diagnose.sh
-apps/native-host/install/install.sh
-apps/native-host/install/uninstall.sh
-apps/native-host/src/host.cts
-apps/native-host/src/native-utils.cts
-apps/native-host/tsconfig.json
-apps/pi/src/host-message.ts
-apps/pi/src/index.ts
-apps/pi/src/names.ts
-apps/pi/tsconfig.json
-packages/shared/src/messages.ts
-packages/shared/src/pi.ts
-packages/shared/src/protocol.ts
-packages/shared/src/validation.ts
-packages/shared/tsconfig.json
-scripts/copy-extension-assets.cjs
-tests/build-output.test.ts
-tests/extension.test.ts
-tests/native-host.test.ts
-tests/pi.test.ts
-tests/protocol.test.ts
-tests/tsconfig.json
-AGENTS.md
-CHANGELOG.md
-LICENSE
-README.md
-tsconfig.base.json
-tsconfig.json
-types.d.ts
-pnpm-lock.yaml
-package.json
-```
-
-## Project Signatures
-
 ```ts
-// scripts/copy-extension-assets.cjs
-38 function copyFile(from, to);
-43 function copyDir(from, to);
-55 function stripEmptyModuleExport(file);
-61 function chmodExecutable(file);
+// packages/env-wxt/index.ts
+38 export function getDefaultRuntimeEnv(): RuntimeEnv;
+57 [unsafe text omitted]
 
-// apps/extension/src/background.ts
- 19 function connectNative(): void;
- 51 async function openCanvas(message: OpenCanvasMessage): Promise<void>;
- 78 function waitForLoadThenSend(tabId: number, message: OpenCanvasMessage): void;
- 89 async function sendToActiveTab(message: ProtocolMessage): Promise<void>;
- 94 async function sendToTab(tabId: number, message: ProtocolMessage): Promise<void>;
-103 function sendToNative(message: ProtocolMessage): void;
-107 function sendCanvasError(message: OpenCanvasMessage, reason: string): void;
-111 function pingNative(): Promise<ConnectionResult>;
-123 function resolvePing(result: ConnectionResult): void;
+// packages/env-wxt/standard.ts
+37 function PathSegments(pointer: string): string[];
+41 function ErrorToIssue(error: TLocalizedValidationError): StandardSchemaV1.Issue;
+48 export class StandardSchemaProps<Value> implements StandardSchemaV1.Props<Value, Value>, StandardJSONSchemaV1.Props<Value, Value> {
+     constructor(type: TSchema);
+   }
+71 export class StandardSchema<Type extends TSchema, out Value extends unknown = Static<Type>> implements StandardSchemaV1<Value>, StandardJSONSchemaV1<Value> {
+     constructor(type: Type);
+   }
+81 export function StandardSchemaV1<const Type extends TSchema>(type: Type): StandardSchema<Type>;
 
-// apps/extension/src/browser-utils.ts
-1 export function isRestrictedUrl(url?: string): boolean;
+// apps/native-host/src/host.ts
+40 function log(message: string): void;
+44 function sendNative(message: unknown): void;
+52 function sendSocket(socket: net.Socket, message: unknown): void;
+56 function getOrCreateToken(): string;
+64 function onSocketMessage(socket: net.Socket, authed: { value: boolean }, message: PiToNativeHostMessage): void;
+101 function onNativeMessage(message: unknown): void;
+165 function shutdown(code: number): void;
 
-// apps/extension/src/content.ts
-12 function showCanvas(): void;
+// apps/native-host/src/install-native-host-script.ts
+13 function loadEnvFiles(): void;
+29 function listFromEnv(value: string | undefined, fallback: string[]): string[];
+38 function chromeOriginFromId(value: string): string;
+46 async function main(): Promise<void>;
 
-// apps/extension/src/popup.ts
- 35 function mustGetElement<T extends HTMLElement = HTMLElement>(id: string): T;
- 41 function copyToClipboard(text: string): void;
- 45 function getPlatformText(): string;
- 52 function isMacPlatform(): boolean;
- 56 function isWindowsPlatform(): boolean;
- 60 function getInstallCommand(id: string): string;
- 67 async function checkConnection(): Promise<void>;
- 83 function showConnected(): void;
- 91 function showNotInstalled(detail: string): void;
- 99 function showTrouble(error: string): void;
-108 function showChecking(): void;
+// apps/pi/src/define-command.ts
+11 export function defineCommand(command: CommandDefinition): CommandDefinition;
+15 export function registerCommand(pi: ExtensionAPI, command: CommandDefinition): void;
+19 [unsafe text omitted]
 
-// apps/native-host/src/host.cts
- 29 function readPackageJson(): { name: string };
- 42 function reportFsError(action: string, err: unknown): void;
- 49 function rotateLogIfNeeded(): void;
- 58 function log(message: string): void;
- 76 function ensureToken(): string | null;
- 90 function writeMessage(message: NativeMessage): void;
- 94 function processInput(): void;
-115 function handleExtensionMessage(message: NativeMessage): void;
-143 function cleanup(): never;
-
-// apps/native-host/src/native-utils.cts
- 5 export function encodeNativeMessage(message: NativeMessage): Buffer;
-13 export function redactForLog(message: NativeMessage): string;
-
-// apps/native-host/src/runtime-paths.cts
-11 export function getRuntimePaths(packageName: string, platform: NodeJS.Platform = process.platform): RuntimePaths;
-
-// apps/pi/src/host-message.ts
-3 export function isHostMessage(value: unknown): value is HostMessage;
+// apps/pi/src/host-client.ts
+27 export async function connectToHost(options: { socketPath?: string; tokenFile?: string; token?: string } = {}): Promise<void>;
+49 export async function openBrowserAlertAndWait(message: string, timeoutMs = getNativeBridgeAlertTimeoutMs()): Promise<AlertResult>;
+65 export function disconnectFromHost(): void;
+72 function attach(attached: net.Socket): void;
+90 function handleLine(line: string): void;
+97 function dispatch(message: HostMessage): void;
+112 function sendLine(message: PiToHostMessage): void;
+117 function rejectAll(error: Error): void;
+125 async function readToken(explicitPath?: string): Promise<string>;
+133 function isNotFound(error: unknown): boolean;
 
 // apps/pi/src/index.ts
-34 export default function activateBrowserTemplate(pi: ExtensionAPI): void;
+7 export default function browserAlert(pi: ExtensionAPI): void;
 
-// apps/pi/src/names.ts
-1 export function safeName(name: string): string;
-5 export function safeToolName(name: string): string;
-9 export function toTitle(name: string): string;
+// packages/native-messaging-schemas/src/browser-to-native-host.ts
+18 export function isBrowserAlertShownMessage(value: unknown): value is BrowserAlertShownMessage;
+22 export function isBrowserAlertErrorMessage(value: unknown): value is BrowserAlertErrorMessage;
+26 export function isBrowserToNativeHostMessage(value: unknown): value is BrowserToNativeHostMessage;
 
-// packages/shared/src/runtime-paths.ts
-11 export function getRuntimePaths(packageName: string, platform: NodeJS.Platform = process.platform): RuntimePaths;
+// packages/native-messaging-schemas/src/message-types.ts
+33 export function isAlertShownMessage(value: unknown): value is AlertShownMessage;
+37 export function isAlertErrorMessage(value: unknown): value is AlertErrorMessage;
 
-// packages/shared/src/validation.ts
-5 export function isProtocolMessage(value: unknown): value is ProtocolMessage;
+// packages/native-messaging-schemas/src/native-bridge-config.ts
+15 export function getNativeBridgeRuntimeDir(env: NativeBridgeEnv = process.env): string;
+19 export function getNativeBridgeSocketPath(env: NativeBridgeEnv = process.env, platform = process.platform): string;
+28 export function getNativeBridgeTokenPath(env: NativeBridgeEnv = process.env): string;
+36 export function getNativeBridgeAlertTimeoutMs(env: NativeBridgeEnv = process.env, fallbackMs = DEFAULT_ALERT_TIMEOUT_MS): number;
+
+// packages/native-messaging-schemas/src/native-host-to-browser.ts
+17 export function isNativeHostShowAlertMessage(value: unknown): value is NativeHostShowAlertMessage;
+21 export function isNativeHostToBrowserMessage(value: unknown): value is NativeHostToBrowserMessage;
+
+// packages/native-messaging-schemas/src/native-host-to-pi.ts
+45 export function isPongMessage(value: unknown): value is PongMessage;
+49 export function isAlertShown(value: unknown): value is AlertShown;
+53 export function isAlertError(value: unknown): value is AlertError;
+57 export function isAlertTimeout(value: unknown): value is AlertTimeout;
+61 export function isSessionReplaced(value: unknown): value is SessionReplaced;
+65 export function isAlertResult(value: unknown): value is AlertResult;
+69 export function isNativeHostToPiMessage(value: unknown): value is NativeHostToPiMessage;
+
+// packages/native-messaging-schemas/src/pi-to-native-host.ts
+33 export function isAuthMessage(value: unknown): value is AuthMessage;
+37 export function isPingMessage(value: unknown): value is PingMessage;
+41 export function isShowAlertRequest(value: unknown): value is ShowAlertRequest;
+45 export function isPiToNativeHostMessage(value: unknown): value is PiToNativeHostMessage;
+
+// apps/browser-extension/entrypoints/background/index.ts
+17 function connectNative(): void;
+50 function sendToNative(message: unknown): NativeSendResult;
+73 async function activeTab(): Promise<Browser.tabs.Tab | undefined>;
+78 async function handleNativeMessage(port: Browser.runtime.Port, message: unknown): Promise<void>;
+
+// apps/browser-extension/entrypoints/popup/main.ts
+3 function setNativeStatus(result: NativeConnectionResult): void;
+16 async function refreshNativeStatus(): Promise<void>;
 ```
-
-## How the pieces talk
-
-```text
-Pi command/tool
-  -> apps/pi
-  -> local socket + token
-  -> apps/native-host
-  -> Chrome native messaging
-  -> apps/extension background
-  -> active tab content script
-  -> browser
-```
-
-The protocol lives in one place:
-
-```text
-packages/shared/src/messages.ts
-```
-
-Message types are created from TypeBox schemas, then reused across the Pi extension, native host, browser extension, and tests. If you add or change a message, start there.

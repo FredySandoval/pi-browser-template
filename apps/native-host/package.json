@@ -1,0 +1,24 @@
+{
+  "name": "@repo/native-host",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "prebuild": "pnpm --filter @repo/native-messaging-schemas build",
+    "build": "tsc && chmod +x dist/host.js",
+    "typecheck": "tsc --noEmit",
+    "setup": "pnpm build && node ./dist/install-native-host-script.js",
+    "clean": "git clean -xdf .cache dist node_modules"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^25.6.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.31.0",
+  "dependencies": {
+    "@repo/env-wxt": "workspace:*",
+    "@repo/native-messaging-schemas": "workspace:*",
+    "web-ext-native-msg": "^8.0.14"
+  }
+}
