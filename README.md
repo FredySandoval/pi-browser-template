@@ -1,6 +1,6 @@
 # pi-browser-template
 
-**Build Pi-powered Chrome/Chromium extensions with end-to-end type-safe native messaging.**
+**Production-grade ready template for Pi-powered browser extensions**
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![pnpm](https://img.shields.io/badge/pnpm-orange?logo=pnpm&logoColor=white)
@@ -10,9 +10,9 @@
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
 
-`pi-browser-template` is a working starter kit for developers building Pi extensions that need to control or communicate with a browser. It wires together a Pi command/tool, a local native messaging host, a Chrome/Chromium extension, and shared runtime-validated TypeScript protocol messages.
+`pi-browser-template` is a small starter project for connecting a Pi extension to a browser extension through a native messaging host.
 
-If this template saves you setup time, consider starring it so you can find it again later.
+The included example lets Pi show an `alert()` in the active browser tab.
 
 ## Demo
 
@@ -20,27 +20,20 @@ Quick walkthrough of the full Pi → native host → browser flow:
 
 <img width="960" height="540" alt="584631065-1883c43b-2280-4ef6-845d-ae77c134481b" src="https://github.com/user-attachments/assets/e18e0146-30f8-4939-9270-302f971ddbc7" />
 
-## Why this exists
+## What is included
 
-Browser-assisted AI tools usually need several moving pieces to work together: an agent extension, a browser extension, native messaging, content scripts, local sockets, and protocol validation. Getting that wiring correct is tedious and easy to break.
-
-This repository gives you a small, understandable, tested baseline so you can start from working infrastructure instead of rebuilding the bridge from scratch.
-
-## What you get
-
-- **End-to-end type safety** from Pi to the browser extension.
-- **Shared TypeBox schemas** and TypeScript protocol types in `packages/shared`.
-- **A Pi extension** that registers both a command and a tool.
-- **A Chrome/Chromium extension** with popup, background service worker, and content script.
-- **A native messaging host** that bridges Chrome native messaging to Pi over a local socket.
-- **Build and test scripts** for each part of the project.
+- `apps/pi` — Pi command and tool.
+- `apps/browser-extension` — WXT Chrome/Chromium extension.
+- `apps/native-host` — native messaging host that connects Chrome to Pi.
+- `packages/native-messaging-schemas` — shared TypeBox message schemas and types.
 
 ## Requirements
 
-- Node.js available on your system path or through `fnm`/`nvm`.
-- `pnpm` 10.31 or newer.
-- Chrome, Chrome for Testing, or Chromium.
-- Pi with this package loaded as a Pi extension.
+- Node.js
+- pnpm 10.31+
+- Chrome, Chrome for Testing, or Chromium
+- Pi installed locally
+- OpenSSL for generating the Chrome extension key
 
 ## 1. Install dependencies
 
@@ -48,150 +41,131 @@ This repository gives you a small, understandable, tested baseline so you can st
 pnpm install
 ```
 
-## Build
+## 2. Create the extension key
+
+Chrome needs a stable extension key in development. This keeps your extension ID the same after reloads.
+
+From the repository root, run:
 
 ```bash
-pnpm build
+mkdir -p .keys
+openssl genrsa -out .keys/chrome-extension.pem 2048
+openssl rsa -in .keys/chrome-extension.pem -pubout -outform DER | openssl base64 -A
 ```
 
-This creates the browser extension and native host files under `dist/`.
+Copy the long value printed by the last command. It should look like:
 
-## Load the browser extension
+```text
+MIIBIjANBgkqhkiG9w0BAQEFA...
+```
+
+## 3. Create the `.env` files
+
+Open `apps/browser-extension/.env.example` and set:
+
+```env
+WXT_CHROME_EXTENSION_KEY="paste-your-key-here"
+```
+
+Create the browser extension env file:
+
+```bash
+cp apps/browser-extension/.env.example apps/browser-extension/.env
+cp apps/native-host/.env.example apps/native-host/.env
+```
+
+## 4. Start the browser extension in dev mode
+
+Run:
+
+```bash
+pnpm dev
+```
+
+WXT will start the extension in development mode. Keep this terminal open.
+
+## 5. Load the extension in Chrome
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Click **Load unpacked**.
-4. Select:
+4. Select the extension output folder shown by WXT.
+
+It is usually one of these:
 
 ```text
-dist/chrome-extension
+apps/browser-extension/.output/chrome-mv3
+dist/chrome-mv3
 ```
 
-## 2. Install the native host
+## 6. Install the native host
 
-### macOS/Linux
+In a second terminal, run:
 
-Copy the command from the extension
+```bash
+NODE_ENV=development pnpm native-host:setup
+# OR
+NODE_ENV=production pnpm native-host:setup
+```
+
+This installs the native messaging manifest for your browser and allows your extension ID to connect.
+
+If Chrome was already open, fully restart Chrome after this step.
+
+The native host setup screen may look like this:
 
 <img width="619" height="216" alt="image" src="https://github.com/user-attachments/assets/591efeed-4390-4d3d-a607-10ea91872e69" />
 
-Pass the Chrome extension ID to the installer:
+## 7. Check the connection
 
-```bash
-# MacOS/Linux
-bash apps/native-host/install/install.sh <extension-id>
-
-# Windows in powershell
-powershell -ExecutionPolicy Bypass -File apps/native-host/install/install.ps1 <extension-id>
-```
-
-The installer writes the native messaging manifest for Chrome/Chromium and allows only your loaded extension origin.
-
-You usually do **not** need to rerun this after rebuilding or reloading the extension, unless the extension ID changes.
-
-Chrome may need to be fully restarted after installing the native host in windows.
-
-## 3. Check the connection
-
-Open the extension popup in Chrome. It will show whether Chrome can reach the native host.
+Open the extension popup in Chrome. It should show whether the native host is connected.
 
 <img width="302" height="131" alt="image" src="https://github.com/user-attachments/assets/88f85a63-a24c-4f19-8db1-299b27ba7a16" />
 
-You can also run:
+## 8. Install this package in Pi
+
+From the parent folder of this repository, run:
 
 ```bash
-# MacOS/Linux
-pnpm diagnose:native
-
-# Windows
-pnpm diagnose:native:win
+pi --no-extensions -e ./
 ```
 
-## 4. Install in Pi for local development
+Restart or reload Pi after installing.
 
-From the parent folder of this repository, install the package into Pi with a local path:
+## 9. Use it from Pi
 
-```bash
-pi install ./pi-browser-template
-```
+This project registers:
 
-After changing the Pi extension code, restart or reload Pi so it picks up the local package changes.
+- Command: `alert-browser`
+- Tool: `open_browser_alert`
 
-## 5. Use from Pi
-
-This package registers:
-
-- a Pi command named after the package name: `pi-browser-template`
-- a Pi tool with a safe tool name based on the package name
-
-The command/tool opens a blank browser window. You can optionally provide a URL.
-
-Example prompt:
+Try this in Pi:
 
 ```text
-Can you run the tool pi-browser-template
+Run the open_browser_alert tool with the message "Hello from Pi"
 ```
 
-## Useful scripts
-
-```bash
-pnpm build             # build extension + native host and copy assets
-pnpm test              # run tests and type checks
-pnpm test:build        # build, then test the output
-pnpm typecheck         # typecheck every workspace part
-pnpm diagnose:native      # inspect macOS/Linux native host installation
-pnpm uninstall:native     # remove macOS/Linux native host manifests, installed files, and temp files
-pnpm diagnose:native:win  # inspect Windows native host installation
-pnpm uninstall:native:win # remove Windows native host registry key and installed files
-pnpm clean                # remove dist/
-```
-
-## Project map
+Or run the command:
 
 ```text
-apps/pi/              Pi extension command and tool
-apps/extension/       Chrome extension source and static assets
-apps/native-host/     Native messaging host and installer
-packages/shared/      Shared schemas, protocol types, and validation
-tests/                Unit and build-output tests
-scripts/              Build helper scripts
+/alert-browser Hello from Pi
 ```
 
-## Development workflow
-
-1. Edit shared protocol types first when data changes.
-2. Update the Pi, native host, and extension handlers.
-3. Run `pnpm test`.
-4. Run `pnpm build`.
-5. Reload the unpacked extension in Chrome.
-6. Try the popup or Pi tool again.
-
-## Cleanup
-
-To uninstall the native messaging host files created by `install.sh`, run:
+## Useful commands
 
 ```bash
-# MacOS/Linux
-pnpm uninstall:native
-
-# Windows
-pnpm uninstall:native:win
-```
-
-This removes the Chrome/Chromium native messaging manifests, the installed native host directory, and this project's temporary socket/token/log files.
-
-You can also remove the unpacked extension from:
-
-```text
-chrome://extensions
+pnpm dev                 # start the browser extension in dev mode
+pnpm native-host:setup   # build and install the native host
+pnpm build               # build all workspaces
+pnpm typecheck           # typecheck all workspaces
+pnpm clean               # remove generated files
 ```
 
 ## Notes
 
-- Chrome native messaging requires an installed host manifest that lists your extension ID.
-- Some browser pages are restricted and cannot receive content scripts.
-- The native host uses `/tmp` socket/token/log paths on macOS/Linux and a named pipe plus `%LOCALAPPDATA%` token/log files on Windows.
-- Keep the shared protocol small. A few clear messages are easier to evolve than one large catch-all message.
+- The same `WXT_CHROME_EXTENSION_KEY` must be used by the browser extension and native host setup.
+- Browser pages like `chrome://extensions` cannot run injected scripts. Test on a normal web page.
+- If the extension ID changes, run `pnpm native-host:setup` again.
 
 ## License
 
