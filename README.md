@@ -12,6 +12,8 @@
 
 `pi-browser-template` is a small starter project for connecting a Pi extension to a browser extension through a native messaging host.
 
+It supports **Linux**, **macOS**, and **Windows**.
+
 The template is **end-to-end type safe**: Pi, the native host, and the browser extension all share validated message types.
 
 The included example lets Pi show an `alert()` in the active browser tab.
@@ -61,13 +63,7 @@ The included example lets Pi show an `alert()` in the active browser tab.
 - Pi installed locally
 - OpenSSL for generating the Chrome extension key
 
-## 1. Install dependencies
-
-```bash
-pnpm install
-```
-
-## 2. Create the extension key
+## 1. Create the extension key
 
 Chrome needs a stable extension key in development. This keeps your extension ID the same after reloads.
 
@@ -85,19 +81,26 @@ Copy the long value printed by the last command. It should look like:
 MIIBIjANBgkqhkiG9w0BAQEFA...
 ```
 
-## 3. Create the `.env` files
+## 2. Create the `.env` files
 
-Open `apps/browser-extension/.env.example` and set:
-
-```env
-WXT_CHROME_EXTENSION_KEY="paste-your-key-here"
-```
-
-Create the browser extension env file:
+Create the env files before installing dependencies. `pnpm install` runs WXT's `postinstall` prepare step, which validates these variables.
 
 ```bash
 cp apps/browser-extension/.env.example apps/browser-extension/.env
 cp apps/native-host/.env.example apps/native-host/.env
+```
+
+Open `apps/browser-extension/.env` and set:
+
+```env
+WXT_CHROME_EXTENSION_KEY="paste-your-key-here"
+WXT_NATIVE_HOST_NAME=pi_native_bridge
+```
+
+## 3. Install dependencies
+
+```bash
+pnpm install
 ```
 
 ## 4. Start the browser extension in dev mode
