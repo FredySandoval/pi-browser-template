@@ -83,18 +83,19 @@ MIIBIjANBgkqhkiG9w0BAQEFA...
 
 ## 2. Create the `.env` files
 
+Open `apps/browser-extension/.env.example` and set:
+
+```env
+# paste-your-key-here
+WXT_CHROME_EXTENSION_KEY="MIIBIjANBgkqhkiG9w0BAQEFA..."
+WXT_NATIVE_HOST_NAME=pi_native_bridge
+```
+
 Create the env files before installing dependencies. `pnpm install` runs WXT's `postinstall` prepare step, which validates these variables.
 
 ```bash
 cp apps/browser-extension/.env.example apps/browser-extension/.env
-cp apps/native-host/.env.example apps/native-host/.env
-```
-
-Open `apps/browser-extension/.env` and set:
-
-```env
-WXT_CHROME_EXTENSION_KEY="paste-your-key-here"
-WXT_NATIVE_HOST_NAME=pi_native_bridge
+cp apps/browser-extension/.env apps/native-host/.env
 ```
 
 ## 3. Install dependencies
