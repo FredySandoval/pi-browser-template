@@ -5,6 +5,12 @@ import { keys } from "@repo/wxt/keys";
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   outDir: "../../dist",
+  dev: {
+    server: {
+      port: 3100,
+      strictPort: false,
+    },
+  },
   webExt: {
     disabled: true,
   },
