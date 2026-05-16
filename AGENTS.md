@@ -26,10 +26,12 @@
 165 function shutdown(code: number): void;
 
 // apps/native-host/src/install-native-host-script.ts
-13 function loadEnvFiles(): void;
-29 function listFromEnv(value: string | undefined, fallback: string[]): string[];
-38 function chromeOriginFromId(value: string): string;
-46 async function main(): Promise<void>;
+14 function chromeExtensionIdFromKey(publicKeyBase64: string): string;
+26 function getChromeExtensionId(): string;
+38 function loadEnvFiles(): void;
+54 function listFromEnv(value: string | undefined, fallback: string[]): string[];
+63 function chromeOriginFromId(value: string): string;
+71 async function main(): Promise<void>;
 
 // apps/pi/src/define-command.ts
 11 export function defineCommand(command: CommandDefinition): CommandDefinition;
