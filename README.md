@@ -12,7 +12,7 @@
 
 `pi-browser-template` is a small starter project for connecting a Pi extension to a browser extension through a native messaging host.
 
-It supports `**Linux**`, `**macOS**`, and `**Windows**`.
+It supports **`Linux`**, **`macOS`**, and **`Windows`**.
 
 The template is **end-to-end type safe**: Pi, the native host, and the browser extension all share validated message types.
 
